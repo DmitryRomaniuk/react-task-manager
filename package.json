@@ -1,0 +1,22 @@
+{
+  "name": "react-task-manager",
+  "version": "1.0.0",
+  "description": "task manager",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DmitryRomaniuk/react-task-manager.git"
+  },
+  "author": "Kanumowa <no@email.com> (kartka.by)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DmitryRomaniuk/react-task-manager/issues"
+  },
+  "homepage": "https://github.com/DmitryRomaniuk/react-task-manager#readme",
+  "devDependencies": {
+    "node-static": "^0.7.7"
+  }
+}
