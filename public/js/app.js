@@ -8,6 +8,10 @@ var listOfProjects = [{
         "name": "Second Task",
         "isChecked": false,
         "listDescriptions": ["Description 4", "Description 5", "Description 6"]
+    }, {
+        "name": "Third Task",
+        "isChecked": false,
+        "listDescriptions": ["Description 7", "Description 8", "Description 9"]
     }]
 }, {
     "nameProject": "Second Project",
@@ -87,72 +91,133 @@ var Footer = React.createClass({
 var ListofProjects = React.createClass({
     getInitialState: function () {
         var list = this.props.list;
-        return {list: list, selectedProject: 0, selectedTask: 0};
+        return {list: list, selectedProject: 0, selectedTask: 0,selectedDescr: 0};
     },
     checkboxClick: function (i, e) {
         this.state.list[this.state.selectedProject].listTask[i].isChecked = e.target.checked;
         this.setState({list: this.state.list});
     },
-    selectTask: function (i, e) {
-        this.setState({selectedTask: i});
-    },
     selectProject: function (i, e) {
         this.setState({selectedProject: i});
     },
-    eraseComment: function (i,e) {
+    selectTask: function (i, e) {
+        this.setState({selectedTask: i});
+    },
+    selectDescr: function (i, e) {
+        this.setState({selectedDescr: i});
+    },
+    eraseComment: function (i, e) {
         console.log(this.state.list);
-        this.state.list[this.state.selectedProject].listTask[this.state.selectedTask].listDescriptions.splice(i,1);
+        this.state.list[this.state.selectedProject].listTask[this.state.selectedTask].listDescriptions.splice(i, 1);
         this.setState({list: this.state.list});
     },
-    eraseTask: function (i,e) {
+    eraseTask: function (i, e) {
+        this.state.list[this.state.selectedProject].listTask.splice(i, 1);
+        this.setState({
+            list: this.state.list,
+            selectedProject: this.state.selectedProject,
+            selectedTask: this.state.selectedTask
+        });
+    },
+    eraseProject: function (i, e) {
         console.log(this.state.list);
-        this.state.list[this.state.selectedProject].listTask.splice(i,1);
-        this.setState({list: this.state.list});
+        this.state.list[this.state.selectedProject].splice(i, 1);
+        this.setState({list, selectedProject, selectedTask});
     },
     editClick: function (e) {
         console.log(e);
         console.log('edit');
         this.setState({list: this.state.list}, console.log('edit'));
     },
-    addTask: function (e) {
-        console.log('edit');
+    addInfo: function (info, action) {
+        switch (info) {
+            case "project":
+                console.log("project");
+                break;
+            case "task":
+                console.log("task");
+                break;
+            case "comment":
+                console.log("comment");
+                break;
+        }
+        console.log(action);
     },
     render: function () {
+        var projList = "0 projects";
+        var taskList = "0 tasks";
+        var commentList = "0 comments";
+        if (this.state.selectedProject && this.state.selectedProject > this.state.list.length-1) {
+            this.state.selectedProject = this.state.list.length-1
+        }
+        if (this.state.list[this.state.selectedProject].listTask.length &&
+            this.state.selectedTask > this.state.list[this.state.selectedProject].listTask.length-1) {
+            this.state.selectedTask = this.state.list[this.state.selectedProject].listTask.length-1
+        }
+        if (this.state.list[this.state.selectedProject]
+                .listTask[this.state.selectedTask].listDescriptions.length &&
+            this.state.selectedDescr > this.state.list[this.state.selectedProject]
+                .listTask[this.state.selectedTask].listDescriptions.length-1) {
+            this.state.selectedDescr = this.state.list[this.state.selectedProject]
+                    .listTask[this.state.selectedTask].listDescriptions.length-1
+        }
+        if (this.state.list.length > 0) {
+            projList = this.state.list.map((task, i)=>
+                <div className={(i==this.state.selectedProject)? "list-group-item active":"list-group-item"}
+                     onClick={this.selectProject.bind(this,i)}
+                     key={i}>
+                    <div className="list-group-item-wrap">
+                        <span> {task.nameProject}</span>
+                        <span className="list-group-item-delete">X</span>
+                        <i className="fa fa-pencil" aria-hidden="true"/>
+                    </div>
+                </div>);
+            if (this.state.list[this.state.selectedProject].listTask.length > 0) {
+                taskList = this.state.list[this.state.selectedProject].listTask.map((task, i)=>
+                    <div className={(i==this.state.selectedTask)? "list-group-item active":"list-group-item"}
+                         key={i+100}
+                         onClick={this.selectTask.bind(this,i)}>
+                        <div className="list-group-item-wrap">
+                            <input type="checkbox"
+                                   checked={task.isChecked}
+                                   onChange={this.checkboxClick.bind(this,i)}
+                            />
+                            <span> {task.name}</span>
+                                <span className="list-group-item-delete"
+                                      onClick={this.eraseTask.bind(this,i)}>X</span>
+                            <i className="fa fa-pencil"
+                               aria-hidden="true"
+                               onClick={this.editClick.bind(this,i)}/>
+                        </div>
+                    </div>);
+                if (this.state.list[this.state.selectedProject]
+                        .listTask[this.state.selectedTask].listDescriptions.length > 0) {
+                    commentList = this.state.list[this.state.selectedProject]
+                        .listTask[this.state.selectedTask].listDescriptions.map((descr, i)=>
+                        <div className={(i==this.state.selectedDescr)? "list-group-item active":"list-group-item"}
+                             key={i+10000}
+                             onClick={this.selectDescr.bind(this,i)}>
+                            <div className="list-group-item-wrap">
+                                <span> {descr}</span>
+                                    <span className="list-group-item-delete"
+                                          onClick={this.eraseComment.bind(this,i)}>X</span>
+                                <i className="fa fa-pencil" aria-hidden="true"/>
+                            </div>
+                        </div>
+                    )
+                }
+            }
+        }
         return (
             <div>
                 <article className="col-xs-4 project-left">
                     <div className="list-group">
-                        {this.state.list.map((task, i)=>
-                            <div className={(i==this.state.selectedProject)? "list-group-item active":"list-group-item"}
-                                 onClick={this.selectProject.bind(this,i)}
-                                 key={i}>
-                                <div className="list-group-item-wrap">
-                                    <span> {task.nameProject}</span>
-                                    <span className="list-group-item-delete">X</span>
-                                    <i className="fa fa-pencil" aria-hidden="true"/>
-                                </div>
-                            </div>)}
+                        {projList}
                     </div>
                 </article>
                 <article className="col-xs-4 task-center">
                     <div className="list-group">
-                        {this.state.list[this.state.selectedProject].listTask.map((task, i)=>
-                            <div className={(i==this.state.selectedTask)? "list-group-item active":"list-group-item"}
-                                 key={i+100}
-                                 onClick={this.selectTask.bind(this,i)}>
-                                <div className="list-group-item-wrap">
-                                    <input type="checkbox"
-                                           checked={task.isChecked}
-                                           onChange={this.checkboxClick.bind(this,i)}
-                                    />
-                                    <span> {task.name}</span>
-                                <span className="list-group-item-delete"
-                                      onClick={this.eraseTask.bind(this,i)}>X</span>
-                                    <i className="fa fa-pencil"
-                                       aria-hidden="true"
-                                       onClick={this.editClick.bind(this,i)}/>
-                                </div>
-                            </div>)}
+                        {taskList}
                         <div className="button-create-entry">
                             <button className="btn btn-info" onClick={this.addTask}>Create task</button>
                         </div>
@@ -160,22 +225,31 @@ var ListofProjects = React.createClass({
                 </article>
                 <article className="col-xs-4 description-right">
                     <div className="list-group">
-                        {this.state.list[this.state.selectedProject]
-                            .listTask[this.state.selectedTask].listDescriptions.map((descr, i)=>
-                            <div className={(i==0)? "list-group-item active":"list-group-item"} key={Math.random()}>
-                                <div className="list-group-item-wrap">
-                                    <span> {descr}</span>
-                                    <span className="list-group-item-delete"
-                                            onClick={this.eraseComment.bind(this,i)}>X</span>
-                                    <i className="fa fa-pencil" aria-hidden="true"/>
-                                </div>
-                            </div>
-                        )}
+                        {commentList}
                         <div className="button-create-entry">
-                            <button href="#" className="btn btn-info">Add comment</button>
+                            <button className="btn btn-info" onClick={this.addInfo.bind(this, "comment")}>
+                                Add comment
+                            </button>
                         </div>
                     </div>
                 </article>
+                <div className="modal" id="myModal">
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <button type="button" className="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                <h4 className="modal-title">Modal title</h4>
+                            </div>
+                            <div className="modal-body">
+                                <p>One fine body…</p>
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-default" data-dismiss="modal">Close</button>
+                                <button type="button" className="btn btn-primary">Save changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         )
     }
